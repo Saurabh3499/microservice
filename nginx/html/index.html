@@ -2,26 +2,80 @@
 <html>
 <head>
   <title>Grocery App</title>
+  <style>
+    body { font-family: Arial; }
+    .item { border: 1px solid #ccc; padding: 10px; margin: 10px; width: 200px; }
+    .item img { width: 100px; }
+    button { margin: 5px; }
+  </style>
 </head>
 <body>
-  <h1>🛒 Grocery Application</h1>
 
-  <button onclick="callAPI('/menu')">Menu</button>
-  <button onclick="callAPI('/cart')">Cart</button>
-  <button onclick="callAPI('/order')">Order</button>
+<h1>🛒 Grocery Store</h1>
 
-  <pre id="output"></pre>
+<button onclick="showMenu()">Menu</button>
+<button onclick="showCart()">Cart</button>
+<button onclick="showOrder()">Order</button>
 
-  <script>
-    function callAPI(path) {
-      fetch(path)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("output").textContent =
-            JSON.stringify(data, null, 2);
-        });
-    }
-  </script>
+<hr>
+<div id="content"></div>
+
+<script>
+function showMenu() {
+  fetch('/menu')
+    .then(res => res.json())
+    .then(data => {
+      let html = "<h2>Menu</h2>";
+      data.items.forEach(item => {
+        html += `
+          <div class="item">
+            <img src="${item.image}">
+            <p><b>${item.name}</b></p>
+            <p>₹${item.price}</p>
+            <button onclick='addToCart(${JSON.stringify(item)})'>Add</button>
+          </div>
+        `;
+      });
+      document.getElementById("content").innerHTML = html;
+    });
+}
+
+function addToCart(item) {
+  fetch('/cart', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(item)
+  }).then(() => alert(item.name + " added"));
+}
+
+function showCart() {
+  fetch('/cart')
+    .then(res => res.json())
+    .then(data => {
+      let html = "<h2>Cart</h2><ul>";
+      for (let name in data.cart) {
+        let i = data.cart[name];
+        html += `<li>${name} - Qty: ${i.qty} - ₹${i.price * i.qty}</li>`;
+      }
+      html += `</ul><h3>Total: ₹${data.total}</h3>`;
+      document.getElementById("content").innerHTML = html;
+    });
+}
+
+function showOrder() {
+  fetch('/order')
+    .then(res => res.json())
+    .then(data => {
+      let html = `<h2>Order Confirmed</h2><ul>`;
+      for (let name in data.items) {
+        let i = data.items[name];
+        html += `<li>${name} x ${i.qty}</li>`;
+      }
+      html += `</ul><h3>Final Price: ₹${data.final_price}</h3>`;
+      document.getElementById("content").innerHTML = html;
+    });
+}
+</script>
+
 </body>
 </html>
-
