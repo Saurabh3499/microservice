@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "8002:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - menu-service
+      - cart-service
+      - order-service
+
+  menu-service:
+    build: ./menu-service
+    container_name: menu-service
+
+  cart-service:
+    build: ./cart-service
+    container_name: cart-service
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
