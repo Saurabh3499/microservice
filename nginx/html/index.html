@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Grocery App</title>
+</head>
+<body>
+  <h1>🛒 Grocery Application</h1>
+
+  <button onclick="callAPI('/menu')">Menu</button>
+  <button onclick="callAPI('/cart')">Cart</button>
+  <button onclick="callAPI('/order')">Order</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    function callAPI(path) {
+      fetch(path)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("output").textContent =
+            JSON.stringify(data, null, 2);
+        });
+    }
+  </script>
+</body>
+</html>
+
